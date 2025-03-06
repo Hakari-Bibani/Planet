@@ -21,7 +21,6 @@ def purchase_page():
     st.write(f"**Total Price:** {total_price} IQD")
     
     customer_full_name = st.text_input("Customer Full Name")
-    # Removed username input
     adress = st.text_input("Address")
     whatsapp_number = st.text_input("Whatsapp Number")
     email = st.text_input("Email")
