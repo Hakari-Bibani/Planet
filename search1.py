@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from handle1 import run_query
-import purchase  # Import the purchase page module
 
 def home_page():
     st.markdown("<h1>Welcome to the Home Page</h1>", unsafe_allow_html=True)
@@ -86,14 +85,13 @@ def home_page():
                         <p><strong>Address:</strong> {row['address']}</p>
                     </div>
                     """, unsafe_allow_html=True)
-                    # "Add Purchase" button for each result.
+                    # When clicking the purchase button, set the purchase mode flag and details.
                     if st.button(f"Add Purchase - {row['common_name']}", key=row['common_name']):
-                        # Store details in session state for purchase page.
                         st.session_state.purchase_tree = row['common_name']
                         st.session_state.available_quantity = row['quantity_in_stock']
                         st.session_state.unit_price = row['price']
-                        # Call the purchase page
-                        purchase.purchase_page()
+                        st.session_state.purchase_mode = True
+                        st.experimental_rerun()
             else:
                 st.write("No results found.")
         else:
