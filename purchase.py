@@ -30,7 +30,7 @@ def purchase_page():
     payment_date = datetime.date.today().isoformat()
 
     if st.button("Order"):
-        # Use the exact column names as in your database schema.
+        # Update the query to use the exact column names as in your schema.
         query = """
         INSERT INTO payments ("  customer_full_name", username, quantity, " amount", adress, whatsapp_number, email, payment_preferences, payment_date, status, note, tree_name)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
