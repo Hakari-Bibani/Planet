@@ -85,7 +85,6 @@ def home_page():
                         <p><strong>Address:</strong> {row['address']}</p>
                     </div>
                     """, unsafe_allow_html=True)
-                    # Unique key now combines common name with index.
                     if st.button(f"Add Purchase - {row['common_name']}", key=f"purchase_{row['common_name']}_{idx}"):
                         st.session_state.purchase_tree = row['common_name']
                         st.session_state.available_quantity = row['quantity_in_stock']
