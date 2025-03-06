@@ -46,3 +46,7 @@ def purchase_page():
             st.success("Order placed successfully!")
         except Exception as e:
             st.error(f"Error placing order: {e}")
+    
+    if st.button("Back to Home"):
+        st.session_state.purchase_mode = False
+        st.experimental_rerun()
