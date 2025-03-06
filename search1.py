@@ -33,6 +33,7 @@ def home_page():
     else:
         height_range_query = "SELECT MIN(min_height) as min_val, MAX(max_height) as max_val FROM Nursery_Tree_Inventory;"
         height_range = run_query(height_range_query)
+        
     if height_range and height_range[0]['min_val'] is not None and height_range[0]['max_val'] is not None:
         slider_min = float(height_range[0]['min_val'])
         slider_max = float(height_range[0]['max_val'])
@@ -89,7 +90,7 @@ def home_page():
                         <p><strong>Address:</strong> {row['address']}</p>
                     </div>
                     """, unsafe_allow_html=True)
-                    # Create a unique key by combining a prefix, the index, and the common name.
+                    # Create a unique key using the loop index and tree's common name
                     unique_key = f"purchase_button_{idx}_{row['common_name']}"
                     if st.button(f"Add Purchase - {row['common_name']}", key=unique_key):
                         st.session_state.purchase_tree = row['common_name']
