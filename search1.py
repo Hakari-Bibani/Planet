@@ -62,7 +62,7 @@ def home_page():
             """
             results = run_query(query, tuple(params))
             if results:
-                for row in results:
+                for idx, row in enumerate(results):
                     st.markdown(f"""
                     <div style="border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
                         <div style="display: flex; align-items: center;">
@@ -85,8 +85,8 @@ def home_page():
                         <p><strong>Address:</strong> {row['address']}</p>
                     </div>
                     """, unsafe_allow_html=True)
-                    # When clicking the purchase button, set the purchase mode flag and details.
-                    if st.button(f"Add Purchase - {row['common_name']}", key=row['common_name']):
+                    # Unique key now combines common name with index.
+                    if st.button(f"Add Purchase - {row['common_name']}", key=f"purchase_{row['common_name']}_{idx}"):
                         st.session_state.purchase_tree = row['common_name']
                         st.session_state.available_quantity = row['quantity_in_stock']
                         st.session_state.unit_price = row['price']
