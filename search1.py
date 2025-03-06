@@ -3,6 +3,10 @@ import pandas as pd
 from handle1 import run_query
 
 def home_page():
+    # If purchase mode is active, do not render the home page.
+    if st.session_state.get("purchase_mode", False):
+        return
+
     st.markdown("<h1>Welcome to the Home Page</h1>", unsafe_allow_html=True)
     
     # Dropdown for Tree Name
@@ -85,7 +89,9 @@ def home_page():
                         <p><strong>Address:</strong> {row['address']}</p>
                     </div>
                     """, unsafe_allow_html=True)
-                    if st.button(f"Add Purchase - {row['common_name']}", key=f"purchase_{row['common_name']}_{idx}"):
+                    # Create a unique key by combining a prefix, the index, and the common name.
+                    unique_key = f"purchase_button_{idx}_{row['common_name']}"
+                    if st.button(f"Add Purchase - {row['common_name']}", key=unique_key):
                         st.session_state.purchase_tree = row['common_name']
                         st.session_state.available_quantity = row['quantity_in_stock']
                         st.session_state.unit_price = row['price']
