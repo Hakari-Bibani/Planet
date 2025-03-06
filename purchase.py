@@ -27,7 +27,6 @@ def purchase_page():
     email = st.text_input("Email")
     payment_preferences = st.selectbox("Payment Preferences", ["Credit Card", "Bank Transfer", "Cash on Arrival"])
     
-    # Auto-fill payment date as today's date.
     payment_date = datetime.date.today().isoformat()
     
     if st.button("Order"):
@@ -54,16 +53,16 @@ def purchase_page():
             ))
             st.success("Order placed successfully!")
             st.session_state.purchase_mode = False
-            try:
+            if hasattr(st, "experimental_rerun"):
                 st.experimental_rerun()
-            except AttributeError:
-                st.warning("Automatic refresh is not available. Please refresh the page manually.")
+            else:
+                st.warning("Automatic page refresh is unavailable. Please refresh the page manually.")
         except Exception as e:
             st.error(f"Error placing order: {e}")
     
     if st.button("Back to Home"):
         st.session_state.purchase_mode = False
-        try:
+        if hasattr(st, "experimental_rerun"):
             st.experimental_rerun()
-        except AttributeError:
-            st.warning("Automatic refresh is not available. Please refresh the page manually.")
+        else:
+            st.warning("Automatic page refresh is unavailable. Please refresh the page manually.")
