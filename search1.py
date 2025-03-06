@@ -8,7 +8,10 @@ def set_purchase(row):
     st.session_state.available_quantity = row["quantity_in_stock"]
     st.session_state.unit_price = row["price"]
     st.session_state.purchase_mode = True
-    st.experimental_rerun()
+    try:
+        st.experimental_rerun()
+    except AttributeError:
+        st.warning("Automatic page refresh is unavailable. Please refresh the page manually to proceed.")
 
 def home_page():
     # Skip rendering home page if purchase mode is active.
