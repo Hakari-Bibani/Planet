@@ -8,10 +8,10 @@ def set_purchase(row):
     st.session_state.available_quantity = row["quantity_in_stock"]
     st.session_state.unit_price = row["price"]
     st.session_state.purchase_mode = True
-    # Check if experimental_rerun exists. If not, ask the user to refresh.
-    if hasattr(st, "experimental_rerun"):
-        st.experimental_rerun()
-    else:
+    # Attempt to call experimental_rerun safely.
+    try:
+        getattr(st, "experimental_rerun")()
+    except AttributeError:
         st.warning("Automatic page refresh is unavailable. Please refresh the page manually to see the purchase page.")
 
 def home_page():
