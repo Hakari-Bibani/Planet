@@ -1,14 +1,12 @@
 import streamlit as st
 from sidebar1 import sidebar_menu
 
+# Get selected page from sidebar
 selected_page = sidebar_menu()
 
-if selected_page == "Search":
+if selected_page == "Home":
     import search1
-    search1.search_page()
-elif selected_page == "Purchase":
-    import purchase
-    purchase.purchase_page()
+    search1.home_page()
 elif selected_page == "Status":
-    import status
-    status.status_page()
+    import status1
+    status1.status_page()
