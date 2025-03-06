@@ -5,9 +5,6 @@ from handle1 import execute_query
 def purchase_page():
     st.markdown("<h2>Purchase Page</h2>", unsafe_allow_html=True)
     
-    # Debug print to verify session state on the purchase page.
-    st.write("DEBUG: Session State in purchase.py", st.session_state)
-    
     if 'purchase_tree' not in st.session_state:
         st.error("No tree selected for purchase.")
         return
@@ -30,22 +27,25 @@ def purchase_page():
     email = st.text_input("Email")
     payment_preferences = st.selectbox("Payment Preferences", ["Credit Card", "Bank Transfer", "Cash on Arrival"])
     
+    # Payment date auto-filled as today's date.
     payment_date = datetime.date.today().isoformat()
     
     if st.button("Order"):
+        # Updated query: Note that the new 'tree_name' column is now the last column.
         query = """
-        INSERT INTO payments (tree_name, "  customer_full_name", username, quantity, " amount", adress, whatsapp_number, email, payment_preferences, payment_date, status, note)
+        INSERT INTO payments ("  customer_full_name", username, quantity, " amount", adress, whatsapp_number, email, payment_preferences, payment_date, status, note, tree_name)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
+        # Default status and note.
         status = "Pending"
         note = ""
         try:
             execute_query(query, (
-                tree_name, customer_full_name, username, str(quantity), str(total_price),
-                adress, whatsapp_number, email, payment_preferences, payment_date, status, note
+                customer_full_name, username, str(quantity), str(total_price),
+                adress, whatsapp_number, email, payment_preferences, payment_date, status, note, tree_name
             ))
             st.success("Order placed successfully!")
-            st.session_state.purchase_mode = False  # Reset to return to home.
+            st.session_state.purchase_mode = False
             st.experimental_rerun()
         except Exception as e:
             st.error(f"Error placing order: {e}")
