@@ -2,8 +2,17 @@ import streamlit as st
 import pandas as pd
 from handle1 import run_query
 
+def set_purchase(row):
+    # Update session state with purchase details.
+    st.session_state.purchase_tree = row['common_name']
+    st.session_state.available_quantity = row['quantity_in_stock']
+    st.session_state.unit_price = row['price']
+    st.session_state.purchase_mode = True
+    # Immediately re-run the app so that app1.py will load the purchase page.
+    st.experimental_rerun()
+
 def home_page():
-    # If purchase mode is active, do not render the home page.
+    # If purchase mode is active, skip rendering home.
     if st.session_state.get("purchase_mode", False):
         return
 
@@ -16,7 +25,7 @@ def home_page():
     col1, col2 = st.columns(2)
     with col1:
         selected_tree = st.selectbox("Select Tree Name", ["All"] + tree_names)
-    # Packaging Type dropdown based on selected tree
+    # Packaging Type dropdown based on selected tree.
     if selected_tree != "All":
         query_packaging = "SELECT DISTINCT packaging_type FROM Nursery_Tree_Inventory WHERE tree_common_name = %s;"
         packaging_types = [row["packaging_type"] for row in run_query(query_packaging, (selected_tree,)) or []]
@@ -26,14 +35,13 @@ def home_page():
     with col2:
         selected_packaging = st.selectbox("Select Packaging Type", ["All"] + packaging_types)
         
-    # Dynamic Height Range Dashboard
+    # Dynamic Height Range Dashboard.
     if selected_tree != "All":
         height_range_query = "SELECT MIN(min_height) as min_val, MAX(max_height) as max_val FROM Nursery_Tree_Inventory WHERE tree_common_name = %s;"
         height_range = run_query(height_range_query, (selected_tree,))
     else:
         height_range_query = "SELECT MIN(min_height) as min_val, MAX(max_height) as max_val FROM Nursery_Tree_Inventory;"
         height_range = run_query(height_range_query)
-        
     if height_range and height_range[0]['min_val'] is not None and height_range[0]['max_val'] is not None:
         slider_min = float(height_range[0]['min_val'])
         slider_max = float(height_range[0]['max_val'])
@@ -90,15 +98,13 @@ def home_page():
                         <p><strong>Address:</strong> {row['address']}</p>
                     </div>
                     """, unsafe_allow_html=True)
-                    # Create a unique key using the loop index and tree's common name
+                    # Use a unique key for each purchase button.
                     unique_key = f"purchase_button_{idx}_{row['common_name']}"
-                    if st.button(f"Add Purchase - {row['common_name']}", key=unique_key):
-                        st.session_state.purchase_tree = row['common_name']
-                        st.session_state.available_quantity = row['quantity_in_stock']
-                        st.session_state.unit_price = row['price']
-                        st.session_state.purchase_mode = True
-                        st.experimental_rerun()
+                    st.button(f"Add Purchase - {row['common_name']}",
+                              key=unique_key,
+                              on_click=set_purchase,
+                              args=(row,))
             else:
                 st.write("No results found.")
         else:
-            st.write("Please select at least one filter.")
+            
