@@ -22,31 +22,45 @@ def purchase_page():
     
     customer_full_name = st.text_input("Customer Full Name")
     username = st.text_input("Username (must be unique)")
-    adress = st.text_input("Address")
+    address = st.text_input("Address")
     whatsapp_number = st.text_input("Whatsapp Number")
     email = st.text_input("Email")
     payment_preference = st.selectbox("Payment Preference", ["Credit Card", "Bank Transfer", "Cash on Arrival"])
     
-    # Payment date auto-filled as today's date.
+    # Auto-fill the payment date as today's date.
     payment_date = datetime.date.today().isoformat()
     
     if st.button("Order"):
-        # Updated query with proper column names and order.
+        # The INSERT query now matches the table schema:
+        # (tree_name, customer_full_name, username, quantity, amount, address,
+        #  whatsapp_number, email, payment_preference, payment_date, status, note)
         query = """
-        INSERT INTO payments (tree_name, customer_full_name, username, quantity, amount, adress, whatsapp_number, email, payment_preference, payment_date, status, note)
+        INSERT INTO payments (tree_name, customer_full_name, username, quantity, amount, address, whatsapp_number, email, payment_preference, payment_date, status, note)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
         status = "Pending"
         note = ""
         try:
             execute_query(query, (
-                tree_name, customer_full_name, username, str(quantity), str(total_price),
-                adress, whatsapp_number, email, payment_preference, payment_date, status, note
+                tree_name,
+                customer_full_name,
+                username,
+                str(quantity),
+                str(total_price),
+                address,
+                whatsapp_number,
+                email,
+                payment_preference,
+                payment_date,
+                status,
+                note
             ))
             st.success("Order placed successfully!")
             st.session_state.purchase_mode = False
             if hasattr(st, "experimental_rerun"):
                 st.experimental_rerun()
+            else:
+                st.info("Please refresh the page manually.")
         except Exception as e:
             st.error(f"Error placing order: {e}")
     
@@ -54,3 +68,8 @@ def purchase_page():
         st.session_state.purchase_mode = False
         if hasattr(st, "experimental_rerun"):
             st.experimental_rerun()
+        else:
+            st.info("Please refresh the page manually.")
+
+if __name__ == "__main__":
+    purchase_page()
