@@ -8,7 +8,7 @@ def status_page():
     if st.button("View Orders"):
         if identifier:
             query = """
-            SELECT tree_name, "  customer_full_name", quantity, " amount", adress, status, note
+            SELECT tree_name, customer_full_name, quantity, amount, address, status, note
             FROM payments
             WHERE username = %s OR email = %s;
             """
@@ -20,3 +20,6 @@ def status_page():
                 st.write("No orders found for the given identifier.")
         else:
             st.write("Please enter a Username or Email.")
+
+if __name__ == "__main__":
+    status_page()
