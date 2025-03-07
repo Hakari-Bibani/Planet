@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 from handle1 import run_query
 
 def status_page():
@@ -21,21 +22,6 @@ def status_page():
             border-radius: 10px;
             margin-bottom: 20px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        }
-        
-        .search-button {
-            background-color: #3498db;
-            color: white;
-            font-weight: 600;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        
-        .search-button:hover {
-            background-color: #2980b9;
         }
         
         .order-table {
@@ -179,73 +165,34 @@ def status_page():
                 # Convert results to DataFrame
                 df = pd.DataFrame(results)
                 
-                # Show summary statistics
+                # Ensure numeric columns are properly converted
+                df['quantity'] = pd.to_numeric(df['quantity'], errors='coerce').fillna(0).astype(int)
+                df['amount'] = pd.to_numeric(df['amount'], errors='coerce').fillna(0)
+                
+                # Calculate summary statistics safely
                 total_orders = len(df)
                 total_amount = df['amount'].sum()
                 total_trees = df['quantity'].sum()
                 
-                # Create summary metrics
+                # Create summary metrics with proper error handling
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     st.metric("Total Orders", f"{total_orders}")
                 with col2:
-                    st.metric("Total Spent", f"{total_amount:,.2f} IQD")
+                    st.metric("Total Spent", f"{total_amount:.2f} IQD")  # Simplified formatting
                 with col3:
                     st.metric("Trees Purchased", f"{total_trees}")
                 
-                # Custom render the orders table with better styling
+                # Display the DataFrame directly with nicer formatting
                 st.markdown("<h3>Your Orders</h3>", unsafe_allow_html=True)
                 
-                # Custom HTML table with better styling
-                table_html = """
-                <table class="order-table">
-                    <thead>
-                        <tr>
-                            <th>Tree</th>
-                            <th>Customer</th>
-                            <th>Quantity</th>
-                            <th>Amount (IQD)</th>
-                            <th>Delivery Address</th>
-                            <th>Status</th>
-                            <th>Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                """
-                
-                for _, row in df.iterrows():
-                    # Determine status class for styling
-                    status_class = "status-processing"
-                    status = row['status'].lower() if isinstance(row['status'], str) else ""
-                    
-                    if "complete" in status or "delivered" in status:
-                        status_class = "status-completed"
-                    elif "cancel" in status:
-                        status_class = "status-cancelled"
-                    elif "pending" in status or "wait" in status:
-                        status_class = "status-pending"
-                    
-                    # Format the amount with commas
-                    amount = f"{row['amount']:,.2f}" if pd.notna(row['amount']) else ""
-                    
-                    table_html += f"""
-                    <tr>
-                        <td>{row['tree_name']}</td>
-                        <td>{row['customer_full_name']}</td>
-                        <td>{row['quantity']}</td>
-                        <td>{amount}</td>
-                        <td>{row['address']}</td>
-                        <td><span class="{status_class}">{row['status']}</span></td>
-                        <td>{row['note'] if pd.notna(row['note']) else ""}</td>
-                    </tr>
-                    """
-                
-                table_html += """
-                    </tbody>
-                </table>
-                """
-                
-                st.markdown(table_html, unsafe_allow_html=True)
+                # Display the table directly using Streamlit for simplicity and reliability
+                st.dataframe(
+                    df.style.format({
+                        'amount': '{:.2f} IQD',
+                    }),
+                    use_container_width=True
+                )
                 
                 # Add export options
                 st.download_button(
@@ -257,9 +204,9 @@ def status_page():
                 
             else:
                 # No results found - show empty state
+                st.warning("No orders found for the given identifier.")
                 st.markdown("""
                 <div class="empty-state">
-                    <img src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png" width="100" height="100" alt="No orders found">
                     <h3>No Orders Found</h3>
                     <p>We couldn't find any orders associated with the provided username or email.</p>
                     <p>If you've recently placed an order, please check the spelling or try using a different identifier.</p>
@@ -274,8 +221,7 @@ if __name__ == "__main__":
     st.set_page_config(
         page_title="Order Status - Tree Nursery",
         page_icon="🌳",
-        layout="wide",
-        initial_sidebar_state="expanded"
+        layout="wide"
     )
     
     status_page()
